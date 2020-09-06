@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import json
+
+con_file = open('./static/config.json')
+config = json.load(con_file)
+con_file.close()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'e7y%l5!fp*yalx6j2tzi8ukxn%k$=gt$ajql!fw_c9c+!7ds$%'
+SECRET_KEY = config['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -74,13 +80,14 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'machines',
-        'USER': 'postgres',
-        'PASSWORD': '10-xvnpzvmhahah',
-        'HOST': '127.0.0.1',
+        'NAME': config['DB_NAME'],
+        'USER': config['DB_USER'],
+        'PASSWORD': config['DB_PASS'],
+        'HOST': config['DB_HOST'],
         'PORT': '5432',
     }
 }
@@ -108,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'Asia/Tomsk'
 

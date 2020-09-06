@@ -1,0 +1,8 @@
+{
+    "DB_HOST": "127.0.0.1",
+    "DB_NAME": "machines",
+    "DB_USER": "postgres",
+    "DB_PASS": "10-xvnpzvmhahah",
+
+    "SECRET_KEY": "e7y%l5!fp*yalx6j2tzi8ukxn%k$=gt$ajql!fw_c9c+!7ds$%"
+}

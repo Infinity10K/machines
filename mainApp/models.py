@@ -14,7 +14,7 @@ class Machine(models.Model):
 	model = models.CharField(max_length=50, null=True)
 	age = models.IntegerField(null=True)
 
-	def __str__(self):
+	def __int__(self):
 		return self.id
 
 class Task(models.Model):
@@ -29,7 +29,7 @@ class Task(models.Model):
 	date_created = models.DateTimeField(auto_now_add=True, null=True)
 	status = models.CharField(max_length=11, null=True, choices=STATUS)
 
-	def __str__(self):
+	def __int__(self):
 		return self.machine.id
 
 class Telemetry(models.Model):
@@ -43,7 +43,7 @@ class Telemetry(models.Model):
 class Replacement(models.Model):
 	date_created = models.DateTimeField(auto_now_add=True, null=True)
 	machine = models.ForeignKey(Machine, null=True, on_delete=models.SET_NULL)
-	compID = models.IntegerField(null=True)
+	compID = models.CharField(max_length=10, null=True)
 
 	def __str__(self):
 		return self.compID

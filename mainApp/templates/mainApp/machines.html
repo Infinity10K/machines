@@ -18,11 +18,12 @@
 							<th>Подробнее</th>
 						</tr>
 
-						{% for i in machines %}
+						{% for machine, res in machines, results %}
 							<tr>
-								<td>{{i.id}}</td>
-								<td>{{i.model}}</td>
-								<td>{{i.age}}</td>
+								<td>{{machine.id}}</td>
+								<td>{{machine.model}}</td>
+								<td>{{machine.age}}</td>
+								<td>{{res}}</td>
 								<td><a class="btn btn-sm btn-info" href="{% url 'machine_info' machine.id %}">Подробнее</a></td>
 							</tr>
 						{% endfor %}

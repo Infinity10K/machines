@@ -1,26 +1,21 @@
-def res(telemetry, errors, maint, failures, machines)
-    import numpy as np
-    import pandas as pd
-    from xgboost import XGBClassifier as xgb
-
-    # telemetry = pd.read_csv("../input/PdM_telemetry.csv", error_bad_lines=False)
-    # errors = pd.read_csv("../input/PdM_errors.csv", error_bad_lines=False)
-    # maint = pd.read_csv("../input/PdM_maint.csv", error_bad_lines=False)
-    # failures = pd.read_csv("../input/PdM_failures.csv", error_bad_lines=False)
-    # machines = pd.read_csv("../input/PdM_machines.csv", error_bad_lines=False)
+import pandas as pd
+import numpy as np
+from xgboost import XGBClassifier as xgb
 
 
-    telemetry["datetime"] = pd.to_datetime(telemetry["datetime"], format="%Y-%m-%d %H:%M:%S")
+def res(telemetry, errors, maint, failures, machines):
 
-    errors["datetime"] = pd.to_datetime(errors["datetime"], format="%Y-%m-%d %H:%M:%S")
-    errors["errorID"] = errors["errorID"].astype("category")
+    telemetry["date_created"] = pd.to_datetime(telemetry["date_created"], format="%Y-%m-%d %H:%M:%S")
 
-    maint["datetime"] = pd.to_datetime(maint["datetime"], format="%Y-%m-%d %H:%M:%S")
-    maint["comp"] = maint["comp"].astype("category")
+    errors["date_created"] = pd.to_datetime(errors["date_created"], format="%Y-%m-%d %H:%M:%S")
+    errors["error"] = errors["error"].astype("category")
+
+    maint["date_created"] = pd.to_datetime(maint["date_created"], format="%Y-%m-%d %H:%M:%S")
+    maint["compID"] = maint["compID"].astype("category")
 
     machines["model"] = machines["model"].astype("category")
 
-    failures["datetime"] = pd.to_datetime(failures["datetime"], format="%Y-%m-%d %H:%M:%S")
+    failures["date_created"] = pd.to_datetime(failures["date_created"], format="%Y-%m-%d %H:%M:%S")
     failures["failure"] = failures["failure"].astype("category")
 
 
@@ -30,8 +25,8 @@ def res(telemetry, errors, maint, failures, machines)
     temp = [
         pd.pivot_table(
             telemetry,
-            index="datetime",
-            columns="machineID",
+            index="date_created",
+            columns="machine_id",
             values=col).resample("3H", closed="left", label="right").mean().unstack()
         for col in fields
     ]
@@ -45,8 +40,8 @@ def res(telemetry, errors, maint, failures, machines)
     temp = [
         pd.pivot_table(
             telemetry,
-            index="datetime",
-            columns="machineID",
+            index="date_created",
+            columns="machine_id",
             values=col).resample("3H", closed="left", label="right").std().unstack()
         for col in fields
     ]
@@ -63,8 +58,8 @@ def res(telemetry, errors, maint, failures, machines)
     temp = [
         pd.pivot_table(
             telemetry,
-            index="datetime",
-            columns="machineID",
+            index="date_created",
+            columns="machine_id",
             values=col).rolling(window=24).mean().resample("3H", closed="left", label="right").first().unstack()
         for col in fields
     ]
@@ -81,8 +76,8 @@ def res(telemetry, errors, maint, failures, machines)
     temp = [
         pd.pivot_table(
             telemetry,
-            index="datetime",
-            columns="machineID",
+            index="date_created",
+            columns="machine_id",
             values=col).rolling(window=24).std().resample("3H", closed="left", label="right").first().unstack(level=-1)
         for col in fields
     ]
@@ -102,15 +97,15 @@ def res(telemetry, errors, maint, failures, machines)
 
 
     error_count = pd.get_dummies(errors)
-    error_count.columns = ["datetime", "machineID", "error1", "error2", "error3", "error4", "error5"]
+    error_count.columns = ["date_created", "machine_id", "error1", "error2", "error3", "error4", "error5"]
 
 
-    error_count_grouped = error_count.groupby(["machineID", "datetime"]).sum().reset_index()
+    error_count_grouped = error_count.groupby(["machine_id", "date_created"]).sum().reset_index()
 
 
-    error_count_filtered = telemetry[["datetime", "machineID"]].merge(
+    error_count_filtered = telemetry[["date_created", "machine_id"]].merge(
         error_count_grouped,
-        on=["machineID", "datetime"],
+        on=["machine_id", "date_created"],
         how="left"
     ).fillna(0.0)
 
@@ -125,8 +120,8 @@ def res(telemetry, errors, maint, failures, machines)
     temp = [
         pd.pivot_table(
             error_count_filtered,
-            index="datetime",
-            columns="machineID",
+            index="date_created",
+            columns="machine_id",
             values=col).rolling(window=24).sum().resample("3H", closed="left", label="right").first().unstack()
         for col in fields
     ]
@@ -139,16 +134,16 @@ def res(telemetry, errors, maint, failures, machines)
 
 
     comp_rep = pd.get_dummies(maint)
-    comp_rep.columns = ["datetime", "machineID", "comp1", "comp2", "comp3", "comp4"]
+    comp_rep.columns = ["date_created", "machine_id", "comp1", "comp2", "comp3", "comp4"]
 
 
-    comp_rep = comp_rep.groupby(["machineID", "datetime"]).sum().reset_index()
+    comp_rep = comp_rep.groupby(["machine_id", "date_created"]).sum().reset_index()
 
 
-    comp_rep = telemetry[["datetime", "machineID"]].merge(
+    comp_rep = telemetry[["date_created", "machine_id"]].merge(
         comp_rep,
-        on=["datetime", "machineID"],
-        how="outer").fillna(0).sort_values(by=["machineID", "datetime"]
+        on=["date_created", "machine_id"],
+        how="outer").fillna(0).sort_values(by=["machine_id", "date_created"]
     )
 
 
@@ -158,23 +153,23 @@ def res(telemetry, errors, maint, failures, machines)
 
         comp_rep.loc[comp_rep[comp] < 1, comp] = None 
 
-        comp_rep.loc[-comp_rep[comp].isnull(), comp] = comp_rep.loc[-comp_rep[comp].isnull(), "datetime"]
+        comp_rep.loc[-comp_rep[comp].isnull(), comp] = comp_rep.loc[-comp_rep[comp].isnull(), "date_created"]
 
         comp_rep[comp] = pd.to_datetime(comp_rep[comp].fillna(method="ffill"))
 
-    comp_rep = comp_rep.loc[comp_rep["datetime"] > pd.to_datetime("2015-01-01")]
+    comp_rep = comp_rep.loc[comp_rep["date_created"] > pd.to_datetime("2015-01-01")]
 
 
-    for comp in components: comp_rep[comp] = (comp_rep["datetime"] - pd.to_datetime(comp_rep[comp])) / np.timedelta64(1, "D")
+    for comp in components: comp_rep[comp] = (comp_rep["date_created"] - pd.to_datetime(comp_rep[comp])) / np.timedelta64(1, "D")
 
 
-    final_feat = telemetry_feat.merge(error_count_total, on=["datetime", "machineID"], how="left")
-    final_feat = final_feat.merge(comp_rep, on=["datetime", "machineID"], how="left")
-    final_feat = final_feat.merge(machines, on=["machineID"], how="left")
+    final_feat = telemetry_feat.merge(error_count_total, on=["date_created", "machine_id"], how="left")
+    final_feat = final_feat.merge(comp_rep, on=["date_created", "machine_id"], how="left")
+    final_feat = final_feat.merge(machines, on=["machine_id"], how="left")
 
 
 
-    labeled_features = final_feat.merge(failures, on=["datetime", "machineID"], how="left")
+    labeled_features = final_feat.merge(failures, on=["date_created", "machine_id"], how="left")
 
 
     labeled_features["failure"] = labeled_features["failure"].astype(object).fillna(method="bfill", limit=7)
@@ -205,8 +200,8 @@ def res(telemetry, errors, maint, failures, machines)
     first_test_date = threshold_dates[1]
 
 
-    ntraining = labeled_features.loc[labeled_features["datetime"] < last_train_date]
-    ntesting = labeled_features.loc[labeled_features["datetime"] > first_test_date]
+    ntraining = labeled_features.loc[labeled_features["date_created"] < last_train_date]
+    ntesting = labeled_features.loc[labeled_features["date_created"] > first_test_date]
 
 
     fails_train = ntraining[ntraining["failure"] != "none"].shape[0]
@@ -215,20 +210,20 @@ def res(telemetry, errors, maint, failures, machines)
     no_fails_test = ntesting[ntesting["failure"] == "none"].shape[0]
 
 
-    train_y = labeled_features.loc[labeled_features["datetime"] < last_train_date, "failure"]
-    train_X = labeled_features.loc[labeled_features["datetime"] < last_train_date].drop(["datetime",
-                                                                                    "machineID",
+    train_y = labeled_features.loc[labeled_features["date_created"] < last_train_date, "failure"]
+    train_X = labeled_features.loc[labeled_features["date_created"] < last_train_date].drop(["date_created",
+                                                                                    "machine_id",
                                                                                     "failure"], axis=1)
-    test_y = labeled_features.loc[labeled_features["datetime"] > first_test_date, "failure"]
-    test_X = labeled_features.loc[labeled_features["datetime"] > first_test_date].drop(["datetime",
-                                                                                   "machineID",
+    test_y = labeled_features.loc[labeled_features["date_created"] > first_test_date, "failure"]
+    test_X = labeled_features.loc[labeled_features["date_created"] > first_test_date].drop(["date_created",
+                                                                                   "machine_id",
                                                                                    "failure"], axis=1)
 
     model = xgb(n_jobs=-1)
     model.fit(train_X, train_y)
 
 
-    test_result = pd.DataFrame(labeled_features.loc[labeled_features["datetime"] > first_test_date])
+    test_result = pd.DataFrame(labeled_features.loc[labeled_features["date_created"] > first_test_date])
     test_result["predicted_failure"] = model.predict(test_X)
     test_results.append(test_result)
     models.append(model)

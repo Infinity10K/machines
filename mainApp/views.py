@@ -4,7 +4,8 @@ from django.forms import inlineformset_factory
 # Create your views here.
 from .models import *
 from .forms import TaskForm
-
+from .classification import res
+import pandas as pd
 
 
 def home(request):
@@ -26,10 +27,18 @@ def home(request):
 def machines(request):
 	machines = Machine.objects.all()
 
-	return render(request, 'mainApp/machines.html', {'machines':machines})
+	telemetry = pd.DataFrame(list(Telemetry.objects.all().values()))
+	errors = pd.DataFrame(list(Error.objects.all().values()))
+	maint = pd.DataFrame(list(Replacement.objects.all().values()))
+	failures = pd.DataFrame(list(Failure.objects.all().values()))
+	machines = pd.DataFrame(list(Machine.objects.all().values()))
 
-def worker(request, pk_test):
-	worker = Worker.objects.get(id=pk_test)
+	predict = res(telemetry, errors, maint, failures, machines)
+
+	return render(request, 'mainApp/machines.html', {'machines':machines, 'predict': predict})
+
+def worker(request, pk):
+	worker = Worker.objects.get(id=pk)
 
 	tasks = worker.task_set.all()
 	task_count = tasks.count()
@@ -71,7 +80,7 @@ def updateTask(request, pk):
 def deleteTask(request, pk):
 	task = Task.objects.get(id=pk)
 	if request.method == "POST":
-		Task.delete()
+		task.delete()
 		return redirect('/')
 
 	context = {'item':task}
@@ -80,3 +89,10 @@ def deleteTask(request, pk):
 #def createWorker(request):
 #
 #	return redirect('/')
+
+#def classification_result(request):
+#	results = res()
+#
+#	context = {'results':results}
+#
+#	return render(request, 'mainApp/machines.html', context)
