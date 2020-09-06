@@ -1,0 +1,36 @@
+{%  extends 'mainApp/main.html' %}
+
+{% block content %}
+
+		<br>
+
+		<div class="row">
+			<div class="col-md">
+				<div class="card card-body">
+					<h5>Станки</h5>
+				</div>
+				<div class="card card-body">
+					<table class="table">
+						<tr>
+							<th>№</th>
+							<th>Станок</th>
+							<th>Время эксплуатации (в годах)</th>
+							<th>Подробнее</th>
+						</tr>
+
+						{% for i in machines %}
+							<tr>
+								<td>{{i.id}}</td>
+								<td>{{i.model}}</td>
+								<td>{{i.age}}</td>
+								<td><a class="btn btn-sm btn-info" href="{% url 'machine_info' machine.id %}">Подробнее</a></td>
+							</tr>
+						{% endfor %}
+						
+					</table>
+				</div>
+			</div>
+			
+		</div>
+
+{% endblock content %}

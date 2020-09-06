@@ -1,0 +1,24 @@
+{%  extends 'mainApp/main.html' %}
+{% load static %}
+{% block content %}
+
+<br>
+<div class="text-center">
+	<div class="col-md-6">
+		<div class="card card-body">
+
+
+			<p>Вы уверены, что хотите удалить "{{item}}"?</p>
+
+			<form action="{% url 'delete_task' item.id  %}" method="POST">
+				
+				{% csrf_token %}
+				<a class="btn btn-warning" href="{% url 'home' %}">Отмена</a>
+
+				<input class="btn btn-danger" type="submit" name="Confirm">
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

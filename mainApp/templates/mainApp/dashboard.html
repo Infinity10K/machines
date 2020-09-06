@@ -1,0 +1,67 @@
+{%  extends 'mainApp/main.html' %}
+
+{% block content %}
+
+{%  include 'mainApp/status.html' %}
+
+<br>
+
+<div class="row">
+	<div class="col-md-5">
+		<h5>Сотрудники:</h5>
+		<hr>
+		<div class="card card-body">
+			<a class="btn btn-primary  btn-sm btn-block" href="">Добавить сотрудника</a>
+			<table class="table table-sm">
+				<tr>
+					<th></th>
+					<th>Сотрудник</th>
+					<th>Должность</th>
+				</tr>
+
+				{% for worker in workers %}
+					<tr>
+						<td><a class="btn btn-sm btn-info" href="{% url 'worker' worker.id %}">Обзор</a></td>
+						<td>{{worker.name}}</td>
+						<td>{{worker.position}}</td>
+					</tr>
+				{% endfor %}
+
+			</table>
+		</div>
+	</div>
+
+	<div class="col-md-7">
+		<h5>Последние ремонтные задачи</h5>
+		<hr>
+		<div class="card card-body">
+			
+			<table class="table table-sm">
+				<tr>
+					<th>Станок</th>
+					<th>Время добавления</th>
+					<th>Статус</th>
+					<th>Обновить</th>
+					<th>Удалить</th>
+				</tr>
+
+				{% for task in tasks %}
+					<tr>
+						<td>{{task.machine}}</td>
+						<td>{{task.date_created}}</td>
+						<td>{{task.status}}</td>
+						<td><a class="btn btn-sm btn-info" href="{% url 'update_task' task.id %}">Обновить</a></td>
+						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}">Удалить</a></td>
+
+					</tr>
+				{% endfor %}
+
+		
+			</table>
+		</div>
+	</div>
+
+</div>
+
+{% endblock %}
+
