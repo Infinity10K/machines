@@ -24,7 +24,7 @@ class Task(models.Model):
 			('Выполнено', 'Выполнено'),
 			)
 
-	worker = models.ManyToManyField(Worker)
+	worker = models.ForeignKey(Worker, null=True, on_delete= models.SET_NULL)
 	machine = models.ForeignKey(Machine, null=True, on_delete= models.SET_NULL)
 	date_created = models.DateTimeField(auto_now_add=True, null=True)
 	status = models.CharField(max_length=11, null=True, choices=STATUS)

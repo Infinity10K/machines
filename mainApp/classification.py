@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from xgboost import XGBClassifier as xgb
+import xgboost as xgb
 
 
 def res(telemetry, errors, maint, failures, machines):
@@ -192,43 +192,67 @@ def res(telemetry, errors, maint, failures, machines):
 
 
     test_results = []
-    models = []
-    total = len(threshold_dates)
+
+#    total = len(threshold_dates)
 
 
     last_train_date = threshold_dates[0]
     first_test_date = threshold_dates[1]
 
 
-    ntraining = labeled_features.loc[labeled_features["date_created"] < last_train_date]
-    ntesting = labeled_features.loc[labeled_features["date_created"] > first_test_date]
+#    ntraining = labeled_features.loc[labeled_features["date_created"] < last_train_date]
+#    ntesting = labeled_features.loc[labeled_features["date_created"] > first_test_date]
+#
+#
+#    fails_train = ntraining[ntraining["failure"] != "none"].shape[0]
+#    no_fails_train = ntraining[ntraining["failure"] == "none"].shape[0]
+#    fails_test = ntesting[ntesting["failure"] != "none"].shape[0]
+#    no_fails_test = ntesting[ntesting["failure"] == "none"].shape[0]
 
 
-    fails_train = ntraining[ntraining["failure"] != "none"].shape[0]
-    no_fails_train = ntraining[ntraining["failure"] == "none"].shape[0]
-    fails_test = ntesting[ntesting["failure"] != "none"].shape[0]
-    no_fails_test = ntesting[ntesting["failure"] == "none"].shape[0]
+#    train_y = labeled_features.loc[labeled_features["date_created"] < last_train_date, "failure"]
+#    train_X = labeled_features.loc[labeled_features["date_created"] < last_train_date].drop(["date_created", "machine_id", "failure"], axis=1)
 
-
-    train_y = labeled_features.loc[labeled_features["date_created"] < last_train_date, "failure"]
-    train_X = labeled_features.loc[labeled_features["date_created"] < last_train_date].drop(["date_created",
-                                                                                    "machine_id",
-                                                                                    "failure"], axis=1)
     test_y = labeled_features.loc[labeled_features["date_created"] > first_test_date, "failure"]
-    test_X = labeled_features.loc[labeled_features["date_created"] > first_test_date].drop(["date_created",
-                                                                                   "machine_id",
-                                                                                   "failure"], axis=1)
+    test_X = labeled_features.loc[labeled_features["date_created"] > first_test_date].drop(["date_created", "machine_id", "failure"], axis=1)
 
-    model = xgb(n_jobs=-1)
-    model.fit(train_X, train_y)
+#    return [test_y, test_X]
+
+
+#def trainX(data):
+#    model = xgb(n_jobs=-1)
+#    model.fit(train_X, train_y)
+#
+#
+#    test_result = pd.DataFrame(labeled_features.loc[labeled_features["date_created"] > first_test_date])
+#    test_result["predicted_failure"] = model.predict(test_X)
+#    test_results.append(test_result)
+#
+#    gr_test = pd.DataFrame(test_X.values, columns=test_X.columns)
+#
+#    probas = model.predict_proba(gr_test)
+#    prediction = model.predict(gr_test)
+#    ordered_classes = np.unique(np.array(test_y))
+#
+#    results = pd.DataFrame(probas, columns=ordered_classes)
+#
+#    return results
+
+#def predictX():
+    model = xgb.XGBClassifier(n_jobs=-1)
+    model.load_model('./static/model.xgb')
 
 
     test_result = pd.DataFrame(labeled_features.loc[labeled_features["date_created"] > first_test_date])
     test_result["predicted_failure"] = model.predict(test_X)
     test_results.append(test_result)
-    models.append(model)
 
+    gr_test = pd.DataFrame(test_X.values, columns=test_X.columns)
 
-    results = pd.DataFrame(probas, columns=ordered_classes)
+    probas = model.predict_proba(gr_test)
+    prediction = model.predict(gr_test)
+    ordered_classes = np.unique(np.array(test_y))
+
+    results = pd.DataFrame(probas, columns=ordered_classes).idxmax(axis=1)
 
     return results

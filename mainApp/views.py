@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect 
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
-# Create your views here.
 from .models import *
 from .forms import TaskForm
 from .classification import res
@@ -27,15 +26,17 @@ def home(request):
 def machines(request):
 	machines = Machine.objects.all()
 
-	telemetry = pd.DataFrame(list(Telemetry.objects.all().values()))
-	errors = pd.DataFrame(list(Error.objects.all().values()))
-	maint = pd.DataFrame(list(Replacement.objects.all().values()))
-	failures = pd.DataFrame(list(Failure.objects.all().values()))
-	machines = pd.DataFrame(list(Machine.objects.all().values()))
+	telemetry = pd.DataFrame(list(Telemetry.objects.all().values())).drop(columns='id')
+	errors = pd.DataFrame(list(Error.objects.all().values())).drop(columns='id')
+	maint = pd.DataFrame(list(Replacement.objects.all().values())).drop(columns='id')
+	failures = pd.DataFrame(list(Failure.objects.all().values())).drop(columns='id')
+	machines = pd.DataFrame(list(Machine.objects.all().values())).rename(columns={"id": "machine_id"})
 
 	predict = res(telemetry, errors, maint, failures, machines)
 
-	return render(request, 'mainApp/machines.html', {'machines':machines, 'predict': predict})
+	machines.append(predict)
+
+	return render(request, 'mainApp/machines.html', {'machines':machines})
 
 def worker(request, pk):
 	worker = Worker.objects.get(id=pk)
@@ -90,9 +91,7 @@ def deleteTask(request, pk):
 #
 #	return redirect('/')
 
-#def classification_result(request):
-#	results = res()
-#
-#	context = {'results':results}
-#
-#	return render(request, 'mainApp/machines.html', context)
+def machineInfo(request, pk):
+	context = {}
+	
+	return render(request, 'mainApp/machine.html', context)

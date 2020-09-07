@@ -15,16 +15,16 @@
 							<th>№</th>
 							<th>Станок</th>
 							<th>Время эксплуатации (в годах)</th>
-							<th>Подробнее</th>
+							<th>Возможная поломка</th>
 						</tr>
 
-						{% for machine, res in machines, results %}
+						{% for machine in machines %}
 							<tr>
 								<td>{{machine.id}}</td>
 								<td>{{machine.model}}</td>
 								<td>{{machine.age}}</td>
-								<td>{{res}}</td>
-								<td><a class="btn btn-sm btn-info" href="{% url 'machine_info' machine.id %}">Подробнее</a></td>
+								<td>{{machine.predict}}</td>
+								<!--<td><a class="btn btn-sm btn-info" href="{% url 'machine_info' machine.id %}">Подробнее</a></td>-->
 							</tr>
 						{% endfor %}
 						
