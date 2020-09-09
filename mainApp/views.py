@@ -5,6 +5,7 @@ from .models import *
 from .forms import TaskForm
 from .classification import res
 import pandas as pd
+import random
 
 
 def home(request):
@@ -23,18 +24,18 @@ def home(request):
 
 	return render(request, 'mainApp/dashboard.html', context)
 
-def machines(request):
+def machines(request):	
 	machines = Machine.objects.all()
 
-	telemetry = pd.DataFrame(list(Telemetry.objects.all().values())).drop(columns='id')
-	errors = pd.DataFrame(list(Error.objects.all().values())).drop(columns='id')
-	maint = pd.DataFrame(list(Replacement.objects.all().values())).drop(columns='id')
-	failures = pd.DataFrame(list(Failure.objects.all().values())).drop(columns='id')
-	machines = pd.DataFrame(list(Machine.objects.all().values())).rename(columns={"id": "machine_id"})
+	#telemetry = pd.DataFrame(list(Telemetry.objects.all().values())).drop(columns='id')
+	#errors = pd.DataFrame(list(Error.objects.all().values())).drop(columns='id')
+	#maint = pd.DataFrame(list(Replacement.objects.all().values())).drop(columns='id')
+	#failures = pd.DataFrame(list(Failure.objects.all().values())).drop(columns='id')
+	#machines = pd.DataFrame(list(Machine.objects.all().values())).rename(columns={"id": "machine_id"})
 
-	predict = res(telemetry, errors, maint, failures, machines)
+	#predict = res(telemetry, errors, maint, failures, machines)
 
-	machines.append(predict)
+	# predict = random.choices(cho, k=Machine.objects.all().count())
 
 	return render(request, 'mainApp/machines.html', {'machines':machines})
 
@@ -57,6 +58,22 @@ def createTask(request, pk):
 		#print('Printing POST:', request.POST)
 		#form = TaskForm(request.POST)
 		formset = TaskFormSet(request.POST, instance=worker)
+		if formset.is_valid():
+			formset.save()
+			return redirect('/')
+
+	context = {'form':formset}
+	return render(request, 'mainApp/task_form.html', context)
+
+def createTaskMachine(request, pk):
+	TaskFormSet = inlineformset_factory(Machine, Task, fields=('machine', 'status'), extra=10 )
+	machine = Machine.objects.get(id=pk)
+	formset = TaskFormSet(queryset=Task.objects.none(),instance=machine)
+	#form = TaskForm(initial={'worker':worker})
+	if request.method == 'POST':
+		#print('Printing POST:', request.POST)
+		#form = TaskForm(request.POST)
+		formset = TaskFormSet(request.POST, instance=machine)
 		if formset.is_valid():
 			formset.save()
 			return redirect('/')
@@ -92,6 +109,14 @@ def deleteTask(request, pk):
 #	return redirect('/')
 
 def machineInfo(request, pk):
-	context = {}
+	
+	machine = Machine.objects.get(id=pk)
+
+	tasks = machine.task_set.all()
+	task_count = tasks.count()
+
+	telemetry = Telemetry.objects.get(id=pk)
+
+	context = {'machine':machine, 'tasks':tasks, 'task_count':task_count, 'telemetry':telemetry}
 	
 	return render(request, 'mainApp/machine.html', context)

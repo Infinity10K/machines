@@ -1,41 +1,37 @@
 {%  extends 'mainApp/main.html' %}
+{% load static %}
 
 {% block content %}
 
 	<br>
 
 <div class="row">
-	<div class="col-md">
+	<div class="col-md-5">
 		<div class="card card-body">
-			<h5>Сотрудник:</h5>
+			<h5>Станок</h5> 
+			<p>ID: {{machine.id}} | Модель: {{machine.model}}</p>
+			<p>Вероятность поломки компоненты <b>comp1</b> 95.7%</p>
+			<hr>
+			<h5>Всего задач: {{task_count}}</h5>
 			<hr>
 			<a class="btn btn-outline-info  btn-sm btn-block" href="">Обновить информацию</a>
-			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'create_task' worker.id %}">Добавить ремонтную задачу</a>
+			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'create_task_machine' machine.id %}">Добавить ремонтную задачу</a>
 
 		</div>
 	</div>
 
-	<div class="col-md">
+	<div class="col-md-7">
 		<div class="card card-body">
-			<h5>Информация о работнике</h5>
+			<h5>Графики</h5>
 			<hr>
-			<p>Должность: {{worker.position}}</p>
-			<p>Квалификация: {{worker.qualification}}</p>
-		</div>
-	</div>
 
-	<div class="col-md">
-		<div class="card card-body">
-			<h5>Всего задач</h5>
-			<hr>
-			<h1 style="text-align: center;padding: 10px">{{task_count}}</h1>
+			<img id="chart" src="{% static 'images/chart.png' %}" />
+			
 		</div>
 	</div>
 </div>
 
-
-<br>
-<div class="row">
+<!--<div class="row">
 	<div class="col">
 		<div class="card card-body">
 			<form method="get">
@@ -46,6 +42,7 @@
 	</div>
 	
 </div>
+-->
 <br>
 
 <div class="row">
@@ -55,6 +52,7 @@
 				<tr>
 					<th>Станок</th>
 					<th>Время добавления</th>
+					<th>Исполнитель</th>
 					<th>Статус</th>
 					<th>Обновить</th>
 					<th>Удалить</th>
@@ -65,6 +63,7 @@
 				<tr>
 					<td>{{task.machine}}</td>
 					<td>{{task.date_created}}</td>
+					<td>{{task.worker}}</td>
 					<td>{{task.status}}</td>
 					<td><a class="btn btn-sm btn-info" href="{% url 'update_task' task.id %}">Обновить</a></td>
 					<td><a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}">Удалить</a></td>

@@ -40,6 +40,7 @@
 				<tr>
 					<th>Станок</th>
 					<th>Время добавления</th>
+					<th>Исполнитель</th>
 					<th>Статус</th>
 					<th>Обновить</th>
 					<th>Удалить</th>
@@ -49,6 +50,7 @@
 					<tr>
 						<td>{{task.machine}}</td>
 						<td>{{task.date_created}}</td>
+						<td>{{task.worker}}</td>
 						<td>{{task.status}}</td>
 						<td><a class="btn btn-sm btn-info" href="{% url 'update_task' task.id %}">Обновить</a></td>
 						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}">Удалить</a></td>

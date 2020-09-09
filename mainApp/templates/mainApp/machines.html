@@ -16,6 +16,7 @@
 							<th>Станок</th>
 							<th>Время эксплуатации (в годах)</th>
 							<th>Возможная поломка</th>
+							<th>Подробнее</th>
 						</tr>
 
 						{% for machine in machines %}
@@ -23,8 +24,8 @@
 								<td>{{machine.id}}</td>
 								<td>{{machine.model}}</td>
 								<td>{{machine.age}}</td>
-								<td>{{machine.predict}}</td>
-								<!--<td><a class="btn btn-sm btn-info" href="{% url 'machine_info' machine.id %}">Подробнее</a></td>-->
+								<td>comp1 | 94%</td>
+								<td><a class="btn btn-sm btn-info" href="{% url 'machine_info' machine.id %}">Подробнее</a></td>
 							</tr>
 						{% endfor %}
 						
