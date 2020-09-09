@@ -29,9 +29,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'afaf4F8S6Ffe4f89w4f984ds84f89w4d86a8f48wq4f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'https://smrmachines.herokuapp.com/']
+ALLOWED_HOSTS = ['127.0.0.1', 'smrmachines.herokuapp.com']
 
 
 # Application definition
@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join('BASE_DIR' , 'db.sqlite3'),
+        'NAME': 'sqlite3.db',
     }
 }
 
@@ -128,10 +128,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/static/images/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
