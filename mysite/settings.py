@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-import json
-
-con_file = open('./static/config.json')
-config = json.load(con_file)
-con_file.close()
+# import json
+# 
+# con_file = open('./static/config.json')
+# config = json.load(con_file)
+# con_file.close()
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config['SECRET_KEY']
+SECRET_KEY = 'afaf4F8S6Ffe4f89w4f984ds84f89w4d86a8f48wq4f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -38,7 +38,6 @@ ALLOWED_HOSTS = ['127.0.0.1', 'https://smrmachines.herokuapp.com/']
 
 INSTALLED_APPS = [
     'mainApp',
-    'googlecharts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -86,12 +85,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config['DB_NAME'],
-        'USER': config['DB_USER'],
-        'PASSWORD': config['DB_PASS'],
-        'HOST': config['DB_HOST'],
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'sqlite3.db',
     }
 }
 

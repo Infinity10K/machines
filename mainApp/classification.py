@@ -240,7 +240,7 @@ def res(telemetry, errors, maint, failures, machines):
 
 #def predictX():
     model = xgb.XGBClassifier(n_jobs=-1)
-    model.load_model('./static/model.xgb')
+    model.load_model('http://see2t.ucoz.ru/model.xgb')
 
 
     test_result = pd.DataFrame(labeled_features.loc[labeled_features["date_created"] > first_test_date])
